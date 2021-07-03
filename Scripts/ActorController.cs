@@ -47,13 +47,12 @@ public class ActorController : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-
+        SetParameter();
     }
 
     private void FixedUpdate()
     {
         ActorMovement();
-        SetParameter();
     }
 
     private void SetParameter()
@@ -61,7 +60,10 @@ public class ActorController : MonoBehaviour
         anim.SetFloat("forward", pi.Dmag);
 
         if (pi.jump)
+        {
             anim.SetTrigger("jump");
+        }
+
     }
 
     private void ActorMovement()
@@ -77,9 +79,6 @@ public class ActorController : MonoBehaviour
             test01 = rb.velocity;
         }
 
-        if (pi.Dmag > 0.1f)
-            transform.forward = Vector3.Slerp(transform.forward, Vector3.ProjectOnPlane(rb.velocity, Vector3.up), turnFactor);
-
         if (state == State.roll)
         {
             rb.velocity =transform.forward*anim.GetFloat("rollVelocity")*rollMultipliar;
@@ -89,6 +88,9 @@ public class ActorController : MonoBehaviour
         {
             rb.velocity = -transform.forward * anim.GetFloat("jabVelocity") * jabMultipliar;
         }
+
+        if (pi.Dmag > 0.1f)
+            transform.forward = Vector3.Slerp(transform.forward, Vector3.ProjectOnPlane(rb.velocity, Vector3.up), turnFactor);
     }
 
 

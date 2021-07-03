@@ -15,10 +15,10 @@ public class PlayerInput : MonoBehaviour
     //signal
     float targetDup;
     float targetDright;
-    Vector2 currentVelocity;
-    public Vector2 targetXZ;
+    Vector3 currentVelocity;
+    public Vector3 targetVelocity;
     public float Dmag;
-    public Vector2 Dvec; //传入的移动信号
+    public Vector3 Dvec; //传入的移动信号
     public float cameraH;
     public float cameraV;
 
@@ -40,6 +40,10 @@ public class PlayerInput : MonoBehaviour
         
     }
 
+    private void FixedUpdate()
+    {
+
+    }
     // Update is called once per frame
     void Update()
     {
@@ -53,22 +57,28 @@ public class PlayerInput : MonoBehaviour
         {
             targetDup = (Input.GetKey(KeyUp) ? 1.0f : 0) - (Input.GetKey(KeyDown) ? 1.0f : 0);
             targetDright = (Input.GetKey(KeyRight) ? 1.0f : 0) - (Input.GetKey(KeyLeft) ? 1.0f : 0);
-            targetXZ = SquareToCircle(targetDup, targetDright);
+            targetVelocity = SquareToCircle(targetDup, targetDright);
             if (Input.GetKey(KeyRun))
             {
                 isRun = true;
-                targetXZ *= 2;
+                targetVelocity *= 2;
             }
 
             jump = Input.GetKeyDown(KeyJump);
+            if (Input.GetKeyDown(KeyJump))
+            {
+                Debug.Log("jump");
+            }
+
         }
         else
         {
             if (!lockPlanarMovement)
-                targetXZ = Vector2.zero;
+                targetVelocity = Vector3.zero;
         }
 
-        Dvec = Vector2.SmoothDamp(Dvec, targetXZ, ref currentVelocity, smoothTime);
+        Dvec = Vector3.SmoothDamp(Dvec, targetVelocity, ref currentVelocity, smoothTime);
+        Dmag = Mathf.Sqrt(Dvec.x * Dvec.x + Dvec.z * Dvec.z);
     }
 
     private void PerspectiveSignal()
@@ -77,11 +87,11 @@ public class PlayerInput : MonoBehaviour
         cameraV = Input.GetAxis("Mouse Y")*hCamFactor;
     }
 
-    private Vector2 SquareToCircle(float targetDup, float targetDright)
+    private Vector3 SquareToCircle(float targetDup, float targetDright)
     {
         float temp = targetDup;
         targetDup *= Mathf.Sqrt(1 - targetDright * targetDright / 2.0f);
         targetDright *= Mathf.Sqrt(1 - temp * temp / 2.0f);
-        return new Vector2(targetDright, targetDup);
+        return new Vector3(targetDright, 0, targetDup);
     }
 }

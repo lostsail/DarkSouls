@@ -24,7 +24,13 @@ public class CameraFollow : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        
+        CameraRotate();
+        CameraMovement();
+    }
+
+    private void LateUpdate()
+    {
+
     }
 
     private void CameraRotate()
@@ -36,12 +42,6 @@ public class CameraFollow : MonoBehaviour
         if (RotateX < -80.0f)
             RotateX = -80.0f;
         transform.eulerAngles = new Vector3(RotateX, transform.eulerAngles.y, transform.eulerAngles.z);
-    }
-
-    private void FixedUpdate()
-    {
-        CameraRotate();
-        CameraMovement();
     }
 
     private void CameraMovement()
