@@ -15,10 +15,10 @@ public class PlayerInput : MonoBehaviour
     //signal
     float targetDup;
     float targetDright;
-    Vector3 currentVelocity;
-    public Vector3 targetVelocity;
+    Vector2 currentVelocity;
+    public Vector2 targetXZ;
     public float Dmag;
-    public Vector3 Dvec; //传入的移动信号
+    public Vector2 Dvec; //传入的移动信号
     public float cameraH;
     public float cameraV;
 
@@ -40,15 +40,11 @@ public class PlayerInput : MonoBehaviour
         
     }
 
-    private void FixedUpdate()
-    {
-        InputSignal();
-        PerspectiveSignal();
-    }
     // Update is called once per frame
     void Update()
     {
-
+        InputSignal();
+        PerspectiveSignal();
     }
 
     private void InputSignal()
@@ -57,11 +53,11 @@ public class PlayerInput : MonoBehaviour
         {
             targetDup = (Input.GetKey(KeyUp) ? 1.0f : 0) - (Input.GetKey(KeyDown) ? 1.0f : 0);
             targetDright = (Input.GetKey(KeyRight) ? 1.0f : 0) - (Input.GetKey(KeyLeft) ? 1.0f : 0);
-            targetVelocity = SquareToCircle(targetDup, targetDright);
+            targetXZ = SquareToCircle(targetDup, targetDright);
             if (Input.GetKey(KeyRun))
             {
                 isRun = true;
-                targetVelocity *= 2;
+                targetXZ *= 2;
             }
 
             jump = Input.GetKeyDown(KeyJump);
@@ -69,11 +65,10 @@ public class PlayerInput : MonoBehaviour
         else
         {
             if (!lockPlanarMovement)
-                targetVelocity = Vector3.zero;
+                targetXZ = Vector2.zero;
         }
 
-        Dvec = Vector3.SmoothDamp(Dvec, targetVelocity, ref currentVelocity, smoothTime);
-        Dmag = Mathf.Sqrt(Dvec.x * Dvec.x + Dvec.z * Dvec.z);
+        Dvec = Vector2.SmoothDamp(Dvec, targetXZ, ref currentVelocity, smoothTime);
     }
 
     private void PerspectiveSignal()
@@ -82,11 +77,11 @@ public class PlayerInput : MonoBehaviour
         cameraV = Input.GetAxis("Mouse Y")*hCamFactor;
     }
 
-    private Vector3 SquareToCircle(float targetDup, float targetDright)
+    private Vector2 SquareToCircle(float targetDup, float targetDright)
     {
         float temp = targetDup;
         targetDup *= Mathf.Sqrt(1 - targetDright * targetDright / 2.0f);
         targetDright *= Mathf.Sqrt(1 - temp * temp / 2.0f);
-        return new Vector3(targetDright, 0, targetDup);
+        return new Vector2(targetDright, targetDup);
     }
 }
