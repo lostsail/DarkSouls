@@ -4,13 +4,14 @@ using UnityEngine;
 
 public class ActorController : MonoBehaviour
 {
-    enum State
+    public enum State
     {
         ground,
         jump,
         fall,
         roll,
-        jab
+        jab,
+        attack
     }
 
     [SerializeField] GameObject model;
@@ -19,7 +20,7 @@ public class ActorController : MonoBehaviour
     Animator anim;
     Rigidbody rb;
 
-    State state = new State();
+    public State state = new State();
 
     [SerializeField] float walkFactor;
     [SerializeField] float runFactor;
@@ -28,7 +29,9 @@ public class ActorController : MonoBehaviour
     [SerializeField] float rollMultipliar;
     [SerializeField] float jabMultipliar;
 
-    [SerializeField] Vector3 test01;
+    float attackLayerTargetWeight;
+    int attackLayerIndex;
+    Vector3 deltaPos;
 
     private void Awake()
     {
@@ -36,6 +39,7 @@ public class ActorController : MonoBehaviour
         anim = model.GetComponent<Animator>();
         rb = GetComponent<Rigidbody>();
         state = State.ground;
+        attackLayerIndex = anim.GetLayerIndex("attack");
     }
 
     // Start is called before the first frame update
@@ -74,13 +78,16 @@ public class ActorController : MonoBehaviour
     {
         float factor = walkFactor * (pi.isRun ? runFactor : 1.0f);
 
+        Debug.Log(deltaPos);
+
+        rb.position += deltaPos;
+        deltaPos = Vector3.zero;
 
         if (!pi.lockPlanarMovement)
         {
             Vector3 forward = Vector3.ProjectOnPlane(cam.transform.forward, Vector3.up).normalized;
             Vector3 right = Vector3.ProjectOnPlane(cam.transform.right, Vector3.up).normalized;
             rb.velocity = right * pi.Dvec.x * factor + forward * pi.Dvec.z * factor + transform.up * rb.velocity.y;
-            test01 = rb.velocity;
 
             if (pi.Dmag > 0.1f)
                 transform.forward = Vector3.Slerp(transform.forward, Vector3.ProjectOnPlane(rb.velocity, Vector3.up), turnFactor);
@@ -96,7 +103,6 @@ public class ActorController : MonoBehaviour
             rb.velocity = -transform.forward * anim.GetFloat("jabVelocity") * jabMultipliar;
         }
     }
-
 
     //Receive Message
 
@@ -163,14 +169,36 @@ public class ActorController : MonoBehaviour
 
     void OnAttackEnter()
     {
-        anim.SetLayerWeight(1, 1.0f);
+        state = State.attack;
+        attackLayerTargetWeight = 1.0f;
         pi.inputEnable = false;
     }
 
-    void OnIdleEnter()
+    void OnAttackUpdate()
     {
-        anim.SetLayerWeight(1, 0f);
+        float attackLayerWeight = Mathf.Lerp(anim.GetLayerWeight(attackLayerIndex), attackLayerTargetWeight, Time.deltaTime* 5);
+        anim.SetLayerWeight(attackLayerIndex, attackLayerWeight);
+        pi.inputEnable = false;
+    }
+
+    void OnAttackIdleEnter()
+    {
+        state = State.ground;
+        attackLayerTargetWeight = 0;
         pi.lockPlanarMovement = false;
         pi.inputEnable = true;
+    }
+
+    void OnAttackIdleUpdate()
+    {
+        float attackLayerWeight = Mathf.Lerp(anim.GetLayerWeight(attackLayerIndex), attackLayerTargetWeight, Time.deltaTime * 5);
+        anim.SetLayerWeight(attackLayerIndex, attackLayerWeight);
+        pi.lockPlanarMovement = false;
+        pi.inputEnable = true;
+    }
+
+    void OnAttackRootMotion(Vector3 _deltaPosition)
+    {
+        deltaPos += _deltaPosition;
     }
 }
