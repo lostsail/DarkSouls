@@ -164,9 +164,7 @@ public class ActorController : MonoBehaviour
     void OnAttackEnter()
     {
         anim.SetLayerWeight(1, 1.0f);
-        pi.lockPlanarMovement = true;
         pi.inputEnable = false;
-        rb.velocity = Vector3.zero;
     }
 
     void OnIdleEnter()
