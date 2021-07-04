@@ -81,6 +81,9 @@ public class ActorController : MonoBehaviour
             Vector3 right = Vector3.ProjectOnPlane(cam.transform.right, Vector3.up).normalized;
             rb.velocity = right * pi.Dvec.x * factor + forward * pi.Dvec.z * factor + transform.up * rb.velocity.y;
             test01 = rb.velocity;
+
+            if (pi.Dmag > 0.1f)
+                transform.forward = Vector3.Slerp(transform.forward, Vector3.ProjectOnPlane(rb.velocity, Vector3.up), turnFactor);
         }
 
         if (state == State.roll)
@@ -92,9 +95,6 @@ public class ActorController : MonoBehaviour
         {
             rb.velocity = -transform.forward * anim.GetFloat("jabVelocity") * jabMultipliar;
         }
-
-        if (pi.Dmag > 0.1f)
-            transform.forward = Vector3.Slerp(transform.forward, Vector3.ProjectOnPlane(rb.velocity, Vector3.up), turnFactor);
     }
 
 
