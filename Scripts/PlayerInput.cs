@@ -33,11 +33,12 @@ public class PlayerInput : MonoBehaviour
     public bool lockPlanarMovement;
     public bool isRun;
     public bool jump;
+    public bool attack;
 
     // Start is called before the first frame update
     void Start()
     {
-        
+
     }
 
     private void FixedUpdate()
@@ -63,13 +64,8 @@ public class PlayerInput : MonoBehaviour
                 isRun = true;
                 targetVelocity *= 2;
             }
-
             jump = Input.GetKeyDown(KeyJump);
-            if (Input.GetKeyDown(KeyJump))
-            {
-                Debug.Log("jump");
-            }
-
+            attack = Input.GetMouseButtonDown(0);
         }
         else
         {
@@ -83,8 +79,8 @@ public class PlayerInput : MonoBehaviour
 
     private void PerspectiveSignal()
     {
-        cameraH = Input.GetAxis("Mouse X")*vCamFactor;
-        cameraV = Input.GetAxis("Mouse Y")*hCamFactor;
+        cameraH = Input.GetAxis("Mouse X") * vCamFactor;
+        cameraV = Input.GetAxis("Mouse Y") * hCamFactor;
     }
 
     private Vector3 SquareToCircle(float targetDup, float targetDright)

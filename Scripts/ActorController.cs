@@ -18,7 +18,7 @@ public class ActorController : MonoBehaviour
     PlayerInput pi;
     Animator anim;
     Rigidbody rb;
-    
+
     State state = new State();
 
     [SerializeField] float walkFactor;
@@ -41,7 +41,7 @@ public class ActorController : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
-        
+
     }
 
     // Update is called once per frame
@@ -64,6 +64,10 @@ public class ActorController : MonoBehaviour
             anim.SetTrigger("jump");
         }
 
+        if (pi.attack)
+        {
+            anim.SetTrigger("attack");
+        }
     }
 
     private void ActorMovement()
@@ -74,14 +78,14 @@ public class ActorController : MonoBehaviour
         if (!pi.lockPlanarMovement)
         {
             Vector3 forward = Vector3.ProjectOnPlane(cam.transform.forward, Vector3.up).normalized;
-            Vector3 right= Vector3.ProjectOnPlane(cam.transform.right, Vector3.up).normalized;
-            rb.velocity =right* pi.Dvec.x* factor+forward* pi.Dvec.z * factor + transform.up * rb.velocity.y;
+            Vector3 right = Vector3.ProjectOnPlane(cam.transform.right, Vector3.up).normalized;
+            rb.velocity = right * pi.Dvec.x * factor + forward * pi.Dvec.z * factor + transform.up * rb.velocity.y;
             test01 = rb.velocity;
         }
 
         if (state == State.roll)
         {
-            rb.velocity =transform.forward*anim.GetFloat("rollVelocity")*rollMultipliar;
+            rb.velocity = transform.forward * anim.GetFloat("rollVelocity") * rollMultipliar;
         }
 
         if (state == State.jab)
@@ -155,5 +159,20 @@ public class ActorController : MonoBehaviour
         rb.velocity = Vector3.zero;
         pi.lockPlanarMovement = true;
         pi.inputEnable = false;
+    }
+
+    void OnAttackEnter()
+    {
+        anim.SetLayerWeight(1, 1.0f);
+        pi.lockPlanarMovement = true;
+        pi.inputEnable = false;
+        rb.velocity = Vector3.zero;
+    }
+
+    void OnIdleEnter()
+    {
+        anim.SetLayerWeight(1, 0f);
+        pi.lockPlanarMovement = false;
+        pi.inputEnable = true;
     }
 }
