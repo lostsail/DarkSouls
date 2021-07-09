@@ -78,8 +78,6 @@ public class ActorController : MonoBehaviour
     {
         float factor = walkFactor * (pi.isRun ? runFactor : 1.0f);
 
-        Debug.Log(deltaPos);
-
         rb.position += deltaPos;
         deltaPos = Vector3.zero;
 

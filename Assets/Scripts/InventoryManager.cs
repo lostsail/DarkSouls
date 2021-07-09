@@ -29,11 +29,12 @@ public class InventoryManager : MonoBehaviour
         }
     }
 
-    private void OnEnable()
+    public static void RefreshInventory()
     {
+        Debug.Log("Refresh");
         RefreshItem();
         instance.itemDescription.text = "";
-        useButton.interactable = false;
+        instance.useButton.interactable = false;
     }
 
     public static void UpdateItemDescription(string itemDesc)

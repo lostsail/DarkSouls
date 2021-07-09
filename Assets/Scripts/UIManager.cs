@@ -10,6 +10,8 @@ public class UIManager : MonoBehaviour
     [SerializeField] GameObject BagUI;
     PlayerInput pi;
 
+    bool isBagOpen;
+
     private void Awake()
     {
         if (!uiManager)
@@ -41,6 +43,21 @@ public class UIManager : MonoBehaviour
         {
             BagUI.SetActive(!BagUI.activeSelf);
             pi.BagSignal = false;
+        }
+
+        if (BagUI.activeSelf)
+            pi.inputEnable = false;
+        else
+            pi.inputEnable = true;
+
+        if (BagUI.activeSelf == true && isBagOpen == false)
+        {
+            InventoryManager.RefreshInventory();
+            isBagOpen = true;
+        }
+        else if (BagUI.activeSelf == false && isBagOpen == true)
+        {
+            isBagOpen = false;
         }
     }
 }
