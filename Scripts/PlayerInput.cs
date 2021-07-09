@@ -11,6 +11,7 @@ public class PlayerInput : MonoBehaviour
     string KeyLeft = "a";
     string KeyRun = "left shift";
     string KeyJump = "space";
+    string KeyBag = "b";
 
     //signal
     float targetDup;
@@ -34,6 +35,7 @@ public class PlayerInput : MonoBehaviour
     public bool isRun;
     public bool jump;
     public bool attack;
+    public bool BagSignal;
 
     // Start is called before the first frame update
     void Start()
@@ -50,6 +52,7 @@ public class PlayerInput : MonoBehaviour
     {
         InputSignal();
         PerspectiveSignal();
+        UISignal();
     }
 
     private void InputSignal()
@@ -81,6 +84,14 @@ public class PlayerInput : MonoBehaviour
     {
         cameraH = Input.GetAxis("Mouse X") * vCamFactor;
         cameraV = Input.GetAxis("Mouse Y") * hCamFactor;
+    }
+
+    private void UISignal()
+    {
+        if (Input.GetKeyDown(KeyBag))
+        {
+            BagSignal = true;
+        }
     }
 
     private Vector3 SquareToCircle(float targetDup, float targetDright)

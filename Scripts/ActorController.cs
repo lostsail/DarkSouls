@@ -178,7 +178,6 @@ public class ActorController : MonoBehaviour
     {
         float attackLayerWeight = Mathf.Lerp(anim.GetLayerWeight(attackLayerIndex), attackLayerTargetWeight, Time.deltaTime* 5);
         anim.SetLayerWeight(attackLayerIndex, attackLayerWeight);
-        pi.inputEnable = false;
     }
 
     void OnAttackIdleEnter()
@@ -193,8 +192,6 @@ public class ActorController : MonoBehaviour
     {
         float attackLayerWeight = Mathf.Lerp(anim.GetLayerWeight(attackLayerIndex), attackLayerTargetWeight, Time.deltaTime * 5);
         anim.SetLayerWeight(attackLayerIndex, attackLayerWeight);
-        pi.lockPlanarMovement = false;
-        pi.inputEnable = true;
     }
 
     void OnAttackRootMotion(Vector3 _deltaPosition)
