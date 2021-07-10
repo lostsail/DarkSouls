@@ -45,18 +45,17 @@ public class UIManager : MonoBehaviour
             pi.BagSignal = false;
         }
 
-        if (BagUI.activeSelf)
-            pi.inputEnable = false;
-        else
-            pi.inputEnable = true;
-
         if (BagUI.activeSelf == true && isBagOpen == false)
         {
+            Time.timeScale = 0;
+            pi.inputEnable = false;
             InventoryManager.RefreshInventory();
             isBagOpen = true;
         }
         else if (BagUI.activeSelf == false && isBagOpen == true)
         {
+            Time.timeScale = 1;
+            pi.inputEnable = true;
             isBagOpen = false;
         }
     }

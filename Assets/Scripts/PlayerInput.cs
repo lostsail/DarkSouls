@@ -31,6 +31,7 @@ public class PlayerInput : MonoBehaviour
 
     //switch
     public bool inputEnable = true;
+    public bool perspectiveEnable = true;
     public bool lockPlanarMovement;
     public bool isRun;
     public bool jump;
@@ -82,8 +83,11 @@ public class PlayerInput : MonoBehaviour
 
     private void PerspectiveSignal()
     {
-        cameraH = Input.GetAxis("Mouse X") * vCamFactor;
-        cameraV = Input.GetAxis("Mouse Y") * hCamFactor;
+        if (perspectiveEnable)
+        {
+            cameraH = Input.GetAxis("Mouse X") * vCamFactor;
+            cameraV = Input.GetAxis("Mouse Y") * hCamFactor; 
+        }
     }
 
     private void UISignal()
