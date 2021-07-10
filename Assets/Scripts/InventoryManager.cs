@@ -33,7 +33,6 @@ public class InventoryManager : MonoBehaviour
 
     public static void RefreshInventory()
     {
-        Debug.Log("Refresh");
         RefreshItem();
         instance.itemDescription.text = "";
         instance.useButton.interactable = false;
@@ -68,6 +67,10 @@ public class InventoryManager : MonoBehaviour
     {
         if (instance.selectedPrefab != null)
         {
+            if (instance.weaponHandle.transform.childCount!=0)
+            {
+                Destroy(instance.weaponHandle.transform.GetChild(0).gameObject); 
+            }
             Instantiate(instance.selectedPrefab,instance.weaponHandle.transform);
         }
     }
