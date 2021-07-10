@@ -15,6 +15,8 @@ public class InventoryManager : MonoBehaviour
     public Button useButton;
     public Slot slotPrefab;
     public Text itemDescription;
+    public GameObject selectedPrefab;
+    public GameObject weaponHandle;
 
     private void Awake()
     {
@@ -62,8 +64,11 @@ public class InventoryManager : MonoBehaviour
         }
     }
 
-    public void UseItem()
-    { 
-        
+    public static void UseItem()
+    {
+        if (instance.selectedPrefab != null)
+        {
+            Instantiate(instance.selectedPrefab,instance.weaponHandle.transform);
+        }
     }
 }

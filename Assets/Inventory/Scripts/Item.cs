@@ -7,5 +7,6 @@ public class Item : ScriptableObject
 {
     public string itemName;
     public Sprite itemPic;
+    public GameObject itemPrefab;
     [TextArea]public string description;
 }

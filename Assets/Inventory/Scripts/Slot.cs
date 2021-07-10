@@ -17,5 +17,6 @@ public class Slot : MonoBehaviour
     {
         InventoryManager.UpdateItemDescription(slotItem.description);
         InventoryManager.s_instance.useButton.interactable = true;
+        InventoryManager.s_instance.selectedPrefab = slotItem.itemPrefab;
     }
 }
