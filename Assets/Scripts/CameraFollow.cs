@@ -6,6 +6,7 @@ public class CameraFollow : MonoBehaviour
 {
     [SerializeField] GameObject player;
     PlayerInput pi;
+    Vector3 currentVelocity;
 
     float RotateX;
     private void Awake()
@@ -24,13 +25,13 @@ public class CameraFollow : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        CameraRotate();
-        CameraMovement();
+
     }
 
     private void LateUpdate()
     {
-
+        CameraRotate();
+        CameraMovement();
     }
 
     private void CameraRotate()
@@ -46,6 +47,6 @@ public class CameraFollow : MonoBehaviour
 
     private void CameraMovement()
     {
-        transform.position = player.transform.position + Vector3.up * 1.4f;
+        transform.position = Vector3.SmoothDamp(transform.position, player.transform.position + Vector3.up * 1.4f,ref currentVelocity,0.1f);
     }
 }
