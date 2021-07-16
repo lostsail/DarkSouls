@@ -31,7 +31,9 @@ public class ActorController : MonoBehaviour
 
     float attackLayerTargetWeight;
     int attackLayerIndex;
+    bool isOnGround;
     Vector3 deltaPos;
+    Vector3 slopeDirection;
 
     private void Awake()
     {
@@ -56,7 +58,21 @@ public class ActorController : MonoBehaviour
 
     private void FixedUpdate()
     {
+        SlopeDetect();
         ActorMovement();
+    }
+
+    private void SlopeDetect()
+    {
+        Ray beginSlopeDetectRay = new Ray(transform.position + Vector3.up * 0.5f, Vector3.down);
+        Ray endSlopeDetectRay = new Ray(transform.position + Vector3.up * 0.5f + transform.forward * 0.1f, Vector3.down);
+        RaycastHit beginHitInfo;
+        RaycastHit endHitInfo;
+
+        if (Physics.Raycast(beginSlopeDetectRay, out beginHitInfo, 1.1f, LayerMask.GetMask("Ground")) && Physics.Raycast(endSlopeDetectRay, out endHitInfo, 1.9f, LayerMask.GetMask("Ground")) && isOnGround)
+            slopeDirection = (endHitInfo.point - beginHitInfo.point).normalized;
+        else
+            slopeDirection = Vector3.zero;
     }
 
     private void SetParameter()
@@ -87,6 +103,7 @@ public class ActorController : MonoBehaviour
             Vector3 right = Vector3.ProjectOnPlane(cam.transform.right, Vector3.up).normalized;
             rb.velocity = right * pi.Dvec.x * factor + forward * pi.Dvec.z * factor + transform.up * rb.velocity.y;
 
+
             if (pi.Dmag > 0.1f)
                 transform.forward = Vector3.Slerp(transform.forward, Vector3.ProjectOnPlane(rb.velocity, Vector3.up), turnFactor);
         }
@@ -99,6 +116,13 @@ public class ActorController : MonoBehaviour
         if (state == State.jab)
         {
             rb.velocity = -transform.forward * anim.GetFloat("jabVelocity") * jabMultipliar;
+        }
+
+
+        if (slopeDirection != Vector3.zero&& (state ==State.ground||state==State.roll))
+        {
+            Debug.Log(slopeDirection);
+            rb.velocity = slopeDirection*rb.velocity.magnitude;
         }
     }
 
@@ -126,11 +150,13 @@ public class ActorController : MonoBehaviour
 
     void IsOnGround()
     {
+        isOnGround = true;
         anim.SetBool("ground", true);
     }
 
     void IsNotOnGround()
     {
+        isOnGround = false;
         anim.SetBool("ground", false);
     }
 
@@ -174,7 +200,7 @@ public class ActorController : MonoBehaviour
 
     void OnAttackUpdate()
     {
-        float attackLayerWeight = Mathf.Lerp(anim.GetLayerWeight(attackLayerIndex), attackLayerTargetWeight, Time.deltaTime* 5);
+        float attackLayerWeight = Mathf.Lerp(anim.GetLayerWeight(attackLayerIndex), attackLayerTargetWeight, Time.deltaTime * 5);
         anim.SetLayerWeight(attackLayerIndex, attackLayerWeight);
     }
 
