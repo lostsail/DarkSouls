@@ -8,7 +8,9 @@ public class UIManager : MonoBehaviour
  
     [SerializeField] GameObject Player;
     [SerializeField] GameObject BagUI;
+    [SerializeField] GameObject PickUpUI;
     PlayerInput pi;
+    List<ItemOnWorld> collectionList;
 
     bool isBagOpen;
 
@@ -23,7 +25,8 @@ public class UIManager : MonoBehaviour
             Destroy(gameObject);
         }
 
-        pi = Player.GetComponent<PlayerInput>();
+        uiManager.pi = Player.GetComponent<PlayerInput>();
+        uiManager.collectionList = new List<ItemOnWorld>();
     }
     // Start is called before the first frame update
     void Start()
@@ -35,28 +38,61 @@ public class UIManager : MonoBehaviour
     void Update()
     {
         BagUIControl();
+        PickUpUIControl();
+    }
+
+    private void PickUpUIControl()
+    {
+        if (collectionList.Count != 0)
+        {
+            uiManager.PickUpUI.SetActive(true);
+            if (Input.GetKeyDown(KeyCode.V))
+            {
+                PickUpItem(collectionList[0]);
+            }
+        }
+        else
+            uiManager.PickUpUI.SetActive(false);
     }
 
     private void BagUIControl()
     {
         if (pi.BagSignal)
         {
-            BagUI.SetActive(!BagUI.activeSelf);
-            pi.BagSignal = false;
+            uiManager.BagUI.SetActive(!BagUI.activeSelf);
+            uiManager.pi.BagSignal = false;
         }
 
         if (BagUI.activeSelf == true && isBagOpen == false)
         {
             Time.timeScale = 0;
-            pi.inputEnable = false;
+            uiManager.pi.inputEnable = false;
             InventoryManager.RefreshInventory();
-            isBagOpen = true;
+            uiManager.isBagOpen = true;
         }
         else if (BagUI.activeSelf == false && isBagOpen == true)
         {
             Time.timeScale = 1;
-            pi.inputEnable = true;
-            isBagOpen = false;
+            uiManager.pi.inputEnable = true;
+            uiManager.isBagOpen = false;
         }
+    }
+
+    public static void CollectItem(ItemOnWorld item)
+    {
+        uiManager.collectionList.Add(item);
+    }
+
+    public static void RemoveItem(ItemOnWorld item)
+    {
+        uiManager.collectionList.Remove(item);
+    }
+
+    public static void PickUpItem(ItemOnWorld item)
+    {
+        item.inventory.list.Add(item.item);
+        InventoryManager.CreateNewItem(item.item);
+        Destroy(item.gameObject);
+        uiManager.collectionList.Remove(item);
     }
 }
