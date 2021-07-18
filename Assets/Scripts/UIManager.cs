@@ -1,18 +1,22 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UI;
 
 public class UIManager : MonoBehaviour
 {
     public static UIManager uiManager;
- 
+
     [SerializeField] GameObject Player;
     [SerializeField] GameObject BagUI;
     [SerializeField] GameObject PickUpUI;
+    [SerializeField] GameObject CollectPrefab;
+    [SerializeField] GameObject CollectableList;
     PlayerInput pi;
     List<ItemOnWorld> collectionList;
 
     bool isBagOpen;
+    int collectAmount;
 
     private void Awake()
     {
@@ -43,16 +47,39 @@ public class UIManager : MonoBehaviour
 
     private void PickUpUIControl()
     {
-        if (collectionList.Count != 0)
+        if (collectAmount!=collectionList.Count)
         {
-            uiManager.PickUpUI.SetActive(true);
+            collectAmount = collectionList.Count;
+
+            if (collectionList.Count != 0)
+            {
+                foreach (Transform child in uiManager.CollectableList.transform)
+                {
+                    Destroy(child.gameObject);
+                }
+
+                foreach (ItemOnWorld item in collectionList)
+                {
+                    GameObject newItem=Instantiate(CollectPrefab, uiManager.CollectableList.transform);
+                    newItem.transform.GetChild(1).GetComponent<Text>().text = item.name;
+                }
+                uiManager.PickUpUI.SetActive(true);
+
+            }
+            else
+            {
+                uiManager.PickUpUI.SetActive(false);
+            }    
+        }
+
+        //Todo 增加选取指定物品的功能 
+        if (uiManager.PickUpUI.activeSelf)
+        {
             if (Input.GetKeyDown(KeyCode.V))
             {
                 PickUpItem(collectionList[0]);
-            }
+            } 
         }
-        else
-            uiManager.PickUpUI.SetActive(false);
     }
 
     private void BagUIControl()
