@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -17,6 +18,9 @@ public class UIManager : MonoBehaviour
 
     bool isBagOpen;
     int collectAmount;
+    int collectIndex;
+    float collectTime;
+    ItemOnWorld selectedItem;
 
     private void Awake()
     {
@@ -29,7 +33,7 @@ public class UIManager : MonoBehaviour
             Destroy(gameObject);
         }
 
-        uiManager.pi = Player.GetComponent<PlayerInput>();
+        uiManager.pi = uiManager.Player.GetComponent<PlayerInput>();
         uiManager.collectionList = new List<ItemOnWorld>();
     }
     // Start is called before the first frame update
@@ -45,26 +49,16 @@ public class UIManager : MonoBehaviour
         PickUpUIControl();
     }
 
-    private void PickUpUIControl()
+    private static void PickUpUIControl()
     {
-        if (collectAmount!=collectionList.Count)
+        if (uiManager.collectAmount != uiManager.collectionList.Count)
         {
-            collectAmount = collectionList.Count;
+            uiManager.collectAmount = uiManager.collectionList.Count;
 
-            if (collectionList.Count != 0)
+            if (uiManager.collectionList.Count != 0)
             {
-                foreach (Transform child in uiManager.CollectableList.transform)
-                {
-                    Destroy(child.gameObject);
-                }
-
-                foreach (ItemOnWorld item in collectionList)
-                {
-                    GameObject newItem=Instantiate(CollectPrefab, uiManager.CollectableList.transform);
-                    newItem.transform.GetChild(1).GetComponent<Text>().text = item.name;
-                }
+                ReFreshCollectList();
                 uiManager.PickUpUI.SetActive(true);
-
             }
             else
             {
@@ -77,27 +71,80 @@ public class UIManager : MonoBehaviour
         {
             if (Input.GetKeyDown(KeyCode.V))
             {
-                PickUpItem(collectionList[0]);
-            } 
+                PickUpItem(uiManager.selectedItem);
+            }
+
+            if (Input.GetAxis("Mouse ScrollWheel") > 0 && Time.time- uiManager.collectTime >0.2f)
+            {
+                uiManager.collectTime = Time.time;
+                uiManager.collectIndex--;
+                ReFreshCollectList();
+            }
+            else if (Input.GetAxis("Mouse ScrollWheel") < 0 && Time.time - uiManager.collectTime > 0.2f)
+            {
+                uiManager.collectTime = Time.time;
+                uiManager.collectIndex++;
+                ReFreshCollectList();
+            }
         }
     }
 
-    private void BagUIControl()
+    private static void ReFreshCollectList()
     {
-        if (pi.BagSignal)
+        if (uiManager.collectIndex < 0)
         {
-            uiManager.BagUI.SetActive(!BagUI.activeSelf);
+            uiManager.collectIndex = 0;
+        }
+
+        else if (uiManager.collectIndex > uiManager.collectionList.Count - 1)
+        {
+            uiManager.collectIndex = uiManager.collectionList.Count - 1;
+        }
+
+        uiManager.selectedItem = uiManager.collectionList[uiManager.collectIndex];
+
+        foreach (Transform child in uiManager.CollectableList.transform)
+        {
+            Destroy(child.gameObject);
+        }
+
+        int i = 0;
+        foreach (ItemOnWorld item in uiManager.collectionList)
+        {
+            GameObject newItem = Instantiate(uiManager.CollectPrefab, uiManager.CollectableList.transform);
+            newItem.name = item.name;
+            newItem.transform.GetChild(1).GetComponent<Text>().text = item.name;
+
+            if (i==uiManager.collectIndex)
+            {
+                newItem.transform.GetChild(0).gameObject.SetActive(true);
+            }
+
+            i++;
+        }
+
+        if (i>1)
+        {
+            uiManager.PickUpUI.transform.GetChild(1).GetComponent<Scrollbar>().value = 1 - (float)(uiManager.collectIndex) / (i - 1); 
+        }
+    }
+
+    private static void BagUIControl()
+    {
+        if (uiManager.pi.BagSignal)
+        {
+            uiManager.BagUI.SetActive(!uiManager.BagUI.activeSelf);
             uiManager.pi.BagSignal = false;
         }
 
-        if (BagUI.activeSelf == true && isBagOpen == false)
+        if (uiManager.BagUI.activeSelf == true && uiManager.isBagOpen == false)
         {
             Time.timeScale = 0;
             uiManager.pi.inputEnable = false;
             InventoryManager.RefreshInventory();
             uiManager.isBagOpen = true;
         }
-        else if (BagUI.activeSelf == false && isBagOpen == true)
+        else if (uiManager.BagUI.activeSelf == false && uiManager.isBagOpen == true)
         {
             Time.timeScale = 1;
             uiManager.pi.inputEnable = true;
@@ -112,6 +159,10 @@ public class UIManager : MonoBehaviour
 
     public static void RemoveItem(ItemOnWorld item)
     {
+        int temp=uiManager.collectionList.FindIndex(x=>x==item);
+        if (temp < uiManager.collectIndex)
+            uiManager.collectIndex--;
+
         uiManager.collectionList.Remove(item);
     }
 

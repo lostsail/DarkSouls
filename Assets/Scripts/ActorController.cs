@@ -121,7 +121,6 @@ public class ActorController : MonoBehaviour
 
         if (slopeDirection != Vector3.zero&& (state ==State.ground||state==State.roll))
         {
-            Debug.Log(slopeDirection);
             rb.velocity = slopeDirection*rb.velocity.magnitude;
         }
     }
