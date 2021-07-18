@@ -39,7 +39,7 @@ public class UIManager : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
-        
+
     }
 
     // Update is called once per frame
@@ -63,7 +63,7 @@ public class UIManager : MonoBehaviour
             else
             {
                 uiManager.PickUpUI.SetActive(false);
-            }    
+            }
         }
 
         //Todo 增加选取指定物品的功能 
@@ -74,33 +74,39 @@ public class UIManager : MonoBehaviour
                 PickUpItem(uiManager.selectedItem);
             }
 
-            if (Input.GetAxis("Mouse ScrollWheel") > 0 && Time.time- uiManager.collectTime >0.2f)
+            if (Input.GetAxis("Mouse ScrollWheel") > 0 && Time.time - uiManager.collectTime > 0.2f)
             {
                 uiManager.collectTime = Time.time;
-                uiManager.collectIndex--;
-                ReFreshCollectList();
+                if (uiManager.collectIndex > 0)
+                {
+                    uiManager.collectIndex--;
+                    ReFreshCollectList();
+                }
+                else
+                {
+                    uiManager.PickUpUI.transform.GetChild(0).Translate(Vector3.down * 20);
+                    Debug.Log("huitan");
+                }
+
+
+
             }
             else if (Input.GetAxis("Mouse ScrollWheel") < 0 && Time.time - uiManager.collectTime > 0.2f)
             {
                 uiManager.collectTime = Time.time;
-                uiManager.collectIndex++;
-                ReFreshCollectList();
+                if (uiManager.collectIndex < uiManager.collectionList.Count - 1)
+                {
+                    uiManager.collectIndex++;
+                    ReFreshCollectList();
+                }
+                else
+                    uiManager.PickUpUI.transform.GetChild(0).Translate(Vector3.up * 20);
             }
         }
     }
 
     private static void ReFreshCollectList()
     {
-        if (uiManager.collectIndex < 0)
-        {
-            uiManager.collectIndex = 0;
-        }
-
-        else if (uiManager.collectIndex > uiManager.collectionList.Count - 1)
-        {
-            uiManager.collectIndex = uiManager.collectionList.Count - 1;
-        }
-
         uiManager.selectedItem = uiManager.collectionList[uiManager.collectIndex];
 
         foreach (Transform child in uiManager.CollectableList.transform)
@@ -115,7 +121,7 @@ public class UIManager : MonoBehaviour
             newItem.name = item.name;
             newItem.transform.GetChild(1).GetComponent<Text>().text = item.name;
 
-            if (i==uiManager.collectIndex)
+            if (i == uiManager.collectIndex)
             {
                 newItem.transform.GetChild(0).gameObject.SetActive(true);
             }
@@ -123,9 +129,9 @@ public class UIManager : MonoBehaviour
             i++;
         }
 
-        if (i>1)
+        if (i > 1)
         {
-            uiManager.PickUpUI.transform.GetChild(1).GetComponent<Scrollbar>().value = 1 - (float)(uiManager.collectIndex) / (i - 1); 
+            uiManager.PickUpUI.transform.GetChild(1).GetComponent<Scrollbar>().value = 1 - (float)(uiManager.collectIndex) / (i - 1);
         }
     }
 
@@ -159,7 +165,7 @@ public class UIManager : MonoBehaviour
 
     public static void RemoveItem(ItemOnWorld item)
     {
-        int temp=uiManager.collectionList.FindIndex(x=>x==item);
+        int temp = uiManager.collectionList.FindIndex(x => x == item);
         if (temp < uiManager.collectIndex)
             uiManager.collectIndex--;
 
