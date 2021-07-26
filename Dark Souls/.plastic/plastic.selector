@@ -1,0 +1,4 @@
+repository "Dark Souls@ssl://lostsail@sh03-plasticscm.unity.cn:8787"
+  path "/"
+    smartbranch "/main/980360085" 
+     
